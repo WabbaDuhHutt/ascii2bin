@@ -8,51 +8,44 @@
 /* Enhancements:                */
 /********************************/
 
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
-#include <math.h>
-#define byte unsigned char
-#define MAX_INT (1 << 30)
 
-int main (int argc, char * argv[], char ** envp)
-{
-int offset = 0x30;
-int number = 0;
-int retval = 1;
-int digit;
-byte ascii_value;
+int main (int argc, char * argv[], char ** envp) {
 
-retval = read(STDIN_FILENO, &ascii_value, 1);
 
-while (retval == 1 || ascii_value != '\n'  )
-{
-    if (ascii_value != '0' && ascii_value != '1' )
-    {
-        return 1;
-    }
-    else
-    {
-        digit = ascii_value - offset;
-        number = (number << 1) + digit;
-        retval = read(0, &ascii_value, 1);
-    }
- }
 
-if (number > MAX_INT)
-{
 
-    fprintf(stderr, "Error Detected!\n");
+	int retval;
+	char ascii_value=0;
+	char digit=0;
+	char offset = 0x30;
+	int number=0;
+	int error = 0;
 
-    return 1;
 
- }
- else {
+    retval = read(0, &ascii_value, 1);
+    while (retval == 1 && ascii_value !='\n') {
 
+		if(ascii_value == offset || ascii_value == 0x31) {
+			digit = ascii_value - offset;
+			number = (number << 1) + digit;
+			retval = read(0, &ascii_value, 1);
+			}
+		else {
+			retval=0;
+			error = error + 1;
+			break;
+			}
+	}
+	if (error == 0) {
     printf("%u\n", number);
+	return 0;
+		}
+	else {
+	return 1;
+	}
 
-    return 0;
-
-}
-
-}
+	}
